@@ -1,0 +1,111 @@
+<div>
+  <div nz-dropdown nzTrigger="click" class="dropdown" [nzDropdownMenu]="menu">
+    <nz-badge nzDot [nzShowDot]="isOnline">
+      <nz-avatar nzIcon="user" [nzShape]="'square'" [nzSize]="'large'" class="avatar"></nz-avatar>
+    </nz-badge>
+  </div>
+  <nz-dropdown-menu #menu="nzDropdownMenu">
+    <ul nz-menu>
+      <li nz-menu-item>
+        <strong>{{ 'topBar.profileMenu.hello' | translate }}, {{name || 'Anonymous'}}</strong>
+        <div>
+          <strong class="mr-1">
+            {{ 'topBar.profileMenu.billingPlan' | translate }}:
+          </strong>
+          Test Account
+        </div>
+        <div>
+          <strong>
+            {{ 'topBar.profileMenu.role' | translate }}:
+          </strong>
+          {{role || '—'}}
+        </div>
+      </li>
+      <li nz-menu-divider></li>
+      <li nz-menu-item>
+        <div>
+          <strong>{{ 'topBar.profileMenu.email' | translate }}: </strong>
+          {{email || '—'}}
+          <br />
+          <strong>{{ 'topBar.profileMenu.phone' | translate }}: </strong>
+          {{phone || '—'}}
+          <br />
+          <strong>Store: </strong>
+          {{storename || '—'}}
+        </div>
+      </li>
+      <li nz-menu-divider></li>
+      <li nz-menu-item>
+        <a href="javascript: void(0);">
+          <i class="fe fe-user mr-2"></i>
+          {{ 'topBar.profileMenu.editProfile' | translate }}:
+        </a>
+      </li>
+      <li nz-menu-divider></li>
+      <li nz-menu-item>
+        <a href="javascript: void(0);" (click)="syncorders()">
+          <i class="fa fa-refresh mr-2"></i>
+          Sync orders
+        </a>
+      </li>
+      <li nz-menu-item>
+        <a href="javascript: void(0);" (click)="syncdata()">
+          <i class="fa fa-refresh mr-2"></i>
+          Sync Data
+        </a>
+      </li>
+      <li nz-menu-divider></li>
+      <li nz-menu-item>
+
+        <a href="javascript: void(0);" (click)="logout()">
+          <i class="fe fe-log-out mr-2"></i>
+          {{ 'topBar.profileMenu.logout' | translate }}
+        </a>
+      </li>
+      <li nz-menu-item>
+        <div>
+          <strong>Version: </strong>
+          1.0.28
+        </div>
+      </li>
+      <li *ngIf="socketserverip" nz-menu-item>
+        <a href="javascript: void(0);" (click)="showQrCode = true">
+          <i class="fe fe-wifi mr-2"></i>
+          {{socketserverip}}:8000
+        </a>
+
+        <!-- <div>
+          <strong>SERVER_URL: </strong>
+          {{socketserverip}}:8000
+        </div> -->
+      </li>
+    </ul>
+  </nz-dropdown-menu>
+</div>
+<!-- <nz-modal [(nzVisible)]="showQrCode" nzTitle="Modal Title" (nzOnCancel)="handleCancel()" (nzOnOk)="handleOk()"
+  [nzOkLoading]="isOkLoading">
+  <p >Modal Content</p>
+</nz-modal> -->
+<nz-modal [(nzVisible)]="showQrCode" (nzOnCancel)="handleCancel()" nzTitle="Scan QR Code in waiter app to connect" (nzOnOk)="handleOk()">
+  <div class="text-center">
+    <qrcode class="bshadow" qrdata="{{socketserverip}}:8000" [width]="256" [errorCorrectionLevel]="'M'"></qrcode>
+    <i class="text-danger">http://{{socketserverip}}:8000</i>
+  </div>
+</nz-modal>
+<ng-template #vertical let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title" id="modal-basic-title">Scan the QR Code in waiter app to connect</h5>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body text-center">
+    <qrcode class="bshadow" qrdata="{{this.socketserverip}}:8000" [width]="256" [errorCorrectionLevel]="'M'"></qrcode>
+    <br>
+    <i class="text-danger">http://{{this.socketserverip}}:8000</i>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-light" (click)="modal.close('Save click')">Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="modal.close('Save click')">Do Something</button>
+  </div>
+</ng-template>

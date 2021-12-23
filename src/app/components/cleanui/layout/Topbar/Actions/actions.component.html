@@ -1,0 +1,75 @@
+<div>
+  <nz-badge [nzCount]="erroredorders.length + pendingorders.length">
+    <div nz-dropdown nzTrigger="click" class="dropdown" [nzDropdownMenu]="menu">
+      <i class="icon fe fe-bell"></i>
+    </div>
+  </nz-badge>
+
+  <nz-dropdown-menu #menu="nzDropdownMenu">
+    <div class="card cui__utils__shadow width-350">
+      <div class="card-body p-0">
+        <div>
+          <nz-tabset class="tabs" [nzSelectedIndex]="0">
+            <nz-tab nzTitle="Error">
+              <div *ngIf="erroredorders.length > 0" class="text-gray-6">
+                <ul class="list-unstyled">
+                  <li class="mb-3" *ngFor="let order of erroredorders">
+                    <div class="head">
+                      <p class="title">
+                        {{order.InvoiceNo}}:
+                        <strong class="text-danger">500 error</strong>
+                      </p>
+                      <button class="btn btn-link" (click)="deleteorder(order.OrderTypeId, order._id)"><i
+                          class="fe fe-trash"></i></button>
+                    </div>
+                    <!-- <div class="row align-items-sm-baseline"> -->
+                    <!-- <p></p> -->
+                    <button style="height: auto; top: -10px;" nz-button nzType="link" [nzPopoverTitle]="titleTemplate"
+                      [nzPopoverContent]="contentTemplate" nzPopoverPlacement="left" nz-popover class="p-0 m-0">
+                      Please contact your service provider.
+                    </button>
+                    <ng-template #titleTemplate>
+                      <i class="fe fe-alert-circle text-danger"></i>
+                      Error Details
+                    </ng-template>
+                    <ng-template #contentTemplate>
+                      <!-- <i nz-icon nzType="check"></i> -->
+                      <div style="max-width: 250px;">
+                        {{order.error.InnerException?.Message || order.error.Message}}
+                        <p *ngIf="order.error.Message.includes('Conversion failed when converting date')">
+                          DeliveryDateTime: <span class="text-danger">{{order.DeliveryDateTime}}</span>
+                        </p>
+                      </div>
+                    </ng-template>
+                    <!-- </div> -->
+                  </li>
+                </ul>
+              </div>
+              <div *ngIf="erroredorders.length == 0" class="text-center mb-3 py-4 bg-light rounded">No Alerts</div>
+            </nz-tab>
+            <nz-tab nzTitle="Pending">
+              <div *ngIf="pendingorders.length == 0" class="text-center mb-3 py-4 bg-light rounded">No Events</div>
+              <div *ngIf="pendingorders.length > 0" class="text-gray-6">
+                <ul class="list-unstyled">
+                  <li class="mb-3" *ngFor="let order of pendingorders">
+                    <div class="head">
+                      <p class="title">
+                        {{order.InvoiceNo}}:
+                        <strong class="text-warning">pending</strong>
+                      </p>
+                      <time class="time">5 min ago</time>
+                    </div>
+                    <p>Please sync orders to sync pending orders when system is online</p>
+                  </li>
+                </ul>
+              </div>
+            </nz-tab>
+            <nz-tab nzTitle="Actions">
+              <div class="text-center mb-3 py-4 bg-light rounded">No Actions</div>
+            </nz-tab>
+          </nz-tabset>
+        </div>
+      </div>
+    </div>
+  </nz-dropdown-menu>
+</div>

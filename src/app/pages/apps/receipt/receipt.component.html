@@ -1,0 +1,453 @@
+<div class="hk-pg-wrapper" id="qqq">
+    <div *ngIf="!show">
+
+        <div hidden *ngIf="roleid == 1" class="card-body">
+
+            <!-- Total Sales -->
+
+            <div class="alignleft">
+                <div class="card" style="width: 15rem;">
+                    <div class="card-body">
+                        <div class="item mb-xl-0 mb-3">
+                            <div class="desc">
+                                <span class="title">Total Sales</span>
+                                <h3>Rs. {{totalsales}}</h3>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Payments -->
+            <div class="alignright">
+                <div class="card" style="width: 15rem;">
+                    <div class="card-body">
+                        <div class="item mb-xl-0 mb-3">
+                            <div class="desc">
+                                <span class="title">Total Payments</span>
+                                <h3>₹ {{transactionpayment}}</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row w-100 mx-0 mb-5 col-xl-12">
+            <div class="input-group col-xl-6 align-middle">
+                <span class="date-range-info">Showing receipts from {{formatter.format(fromDate) | date: 'MMM d, y'}} to
+                    {{formatter.format(toDate) | date: 'MMM d, y'}}</span>
+                <!-- <div style="height: fit-content;" class="input-group-prepend">
+                    <span class="input-group-text"><i class="fe fe-search"></i></span>
+                </div> -->
+                <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)"
+                    [(ngModel)]="invoice" (keyup.enter)="getbyInvoice(invoice)"
+                    placeholder="To search, type the complete local receipt number and press enter." />
+                <div style="height: fit-content;" class="input-group-append">
+                    <button class="btn btn-primary" (click)="datepicker.toggle()"><i
+                            class="fe fe-calendar"></i></button>
+                </div>
+                <div class="form-group hidden">
+                    <div class="input-group">
+                        <input name="datepicker" class="form-control hidden" ngbDatepicker #datepicker="ngbDatepicker"
+                            [autoClose]="'outside'" (dateSelect)="onDateSelection($event, datepicker)"
+                            [displayMonths]="2" [dayTemplate]="t" outsideDays="hidden" [startDate]="fromDate!"
+                            tabindex="-1">
+                        <ng-template #t let-date let-focused="focused">
+                            <span class="custom-day" [class.focused]="focused" [class.range]="isRange(date)"
+                                [class.faded]="isHovered(date) || isInside(date)" (mouseenter)="hoveredDate = date"
+                                (mouseleave)="hoveredDate = null">
+                                {{ date.day }}
+                            </span>
+                        </ng-template>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-6 row">
+                <div *ngIf="roleid == 1" class="col-xl-6">
+                    <div class="sp-metric shadow">
+                        <h4>Rs. {{totalsales}}</h4>
+                        <p>Total Sales</p>
+                    </div>
+                </div>
+                <div *ngIf="roleid == 1" class="col-xl-6">
+                    <div class="sp-metric shadow">
+                        <h4>Rs. {{transactionpayment}}</h4>
+                        <p>Total Payments</p>
+                    </div>
+                </div>
+                <div *ngIf="roleid != 1" class="w-100 row">
+                    <p style="margin: auto;"><i>Sign in as Admin to view Sales & Payments</i></p>
+                </div>
+            </div>
+           
+        </div>
+        <!-- </div> -->
+        <!-- </div> -->
+
+
+        <!-- Receipts Cards -->
+
+
+
+        <div class="col-xl-12 pl-0 pr-0">
+            <!-- <section class="hk-sec-wrapper">
+                    <div class="row">
+                        <div class="col-sm"> -->
+            <div class="table-wrap" *ngIf="receipts!=undefinde">
+                <div class="table-responsive" *ngIf="(receipts.receipts).length>0;else emptyreceipt">
+                    <table class="table mb-0 text-center">{{ngforLen}}
+                        <thead>
+                            <tr>
+                                <th>OrderNo</th>
+                                <th>Created At</th>
+                                <th>Customer Details</th>
+                                <th>Order Status</th>
+                                <th>Payment Status</th>
+                                <th>Paid</th>
+                                <!-- <th></th> -->
+                                <th>BillAmount</th>
+                                <!-- <th></th> -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of receipts.receipts ;let i=index">
+                                <td class="text-left"><img src="{{item.logo}}" width="20"><button type="button"
+                                        class="btn btn-link"
+                                        (click)=" show = 1 ; filter(item.Id,item.ChargeAmount,item.PaidAmount); OrderStatus = item.OrderStatusId">{{item.InvoiceNo}}</button>
+                                </td>
+                                <td>{{item.OrderedDateTime}}</td>
+                                <td class="text-center">
+                                    {{item.Customer==null?"-":item.Customer}}/{{item.PhoneNo==null?"-":item.PhoneNo}}
+                                </td>
+                                <td><span *ngIf="item.OrderStatusId == 5">Completed</span>
+                                    <span *ngIf="item.OrderStatusId != -1 && item.OrderStatusId != 5">Pending</span>
+                                    <span *ngIf="item.OrderStatusId == -1">Cancelled</span>
+                                </td>
+                                <td>
+                                    <span *ngIf="item.OrderStatusId != -1 && item.BillAmount == item.PaidAmount"
+                                        class="badge badge-success mr-10">Paid</span>
+                                    <span *ngIf="item.OrderStatusId != -1 && item.BillAmount > item.PaidAmount"
+                                        class="badge badge-warning mr-10">Pending</span>
+                                    <span *ngIf="item.OrderStatusId == -1"
+                                        class="badge badge-danger mr-10">Cancelled</span>
+                                    <span *ngIf="item.OrderStatusId != -1 && item.BillAmount < item.PaidAmount"
+                                        class="badge badge-danger mr-10">Refundable</span>
+                                </td>
+                                <td>&#8377;{{item.PaidAmount}} /-</td>
+                                <!-- <td>
+                                                    <i class="fe fe-balance-scale-right"></i>
+                                                </td> -->
+                                <td>{{item.OrderStatusId==-1?'Refunded &#8377;'+item.BillAmount+'
+                                    /-':'&#8377;'+item.BillAmount+' /-' }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="text-center">
+                        <button [class.disabled]="LastId" [ngClass]="{'text-blue': !LastId}" class="btn btn-link"
+                            (click)="nextRecipts('prev')">Previous</button>
+                        <button [class.disabled]="FirstId" [ngClass]="{'text-blue': !FirstId}"
+                            class="btn btn-link text-blue" (click)="nextRecipts('next')">Next</button>
+                    </div>
+                </div>
+                <ng-template #emptyreceipt>
+                    <p class="text-center">No receipts found!</p>
+                </ng-template>
+            </div>
+            <!-- </div>
+                    </div>
+                </section> -->
+        </div>
+        <!-- </div> -->
+    </div>
+
+    <div class="container" *ngIf="show">
+        <!-- Title -->
+        <div class="hk-pg-header col-xl-12 row">
+            <h4 class="hk-pg-title col-xl-6"> <span class="badge badge-primary mr-2">{{ordertype}}</span> {{orderno}}
+            </h4>
+            <div class="mb-10 text-right col-xl-6 float-right"><button class="btn btn-link"
+                    (click)="show=0">Back</button>|<button class="btn btn-link" (click)="electronPrint()">print</button>
+                <span *ngIf="OrderStatus != -1&&roleid == 1"> |<button class="btn btn-link"
+                        (click)="openOrderpopup(CancelReceipt)">Cancel</button></span>
+            </div>
+        </div>
+        <!-- Row -->
+        <div class="col-xl-12 pl-0 pr-0">
+            <section class="hk-sec-wrapper">
+                <div class="row col-xl-12">
+                    <div class="col-xl-6 mt-5">
+                        <div class="mb-2 ml-0 row"> 
+                            <strong>CustomerName :</strong><span>{{customer.Name}} |
+                                {{customer.PhoneNo}}</span>
+                        </div>
+                        <div class="mb-2 ml-0 row">
+                            <strong>CustomerAddress :</strong><span>{{customer.Address}}</span>
+                        </div>
+                        <div class="mb-2 ml-0 row">
+                            <strong>City :</strong><span>{{customer.City}}</span>
+                        </div>
+                        <!-- <hr> -->
+                        <div class="mb-2 ml-0 row">
+                            <strong>Order Tickets: </strong>
+                            <span *ngFor="let item of KOTs; let last = last"
+                                (click)="KOTFilter(item.Id);openOrderpopup(KOTItem)"><a href="javascript:void(0)"
+                                    class="sp-fit-width">&nbsp;#{{item.KOTNo}}<span
+                                        *ngIf="!last">,</span>&nbsp;</a></span>
+                        </div>
+                        <!-- <hr> -->
+                        <div class="mb-2">
+                            <strong>Payment History</strong><br>
+                            <ul>
+                                <span *ngFor="let item of transactions">
+                                    <li *ngIf="item.TransTypeId==1">
+                                        <span class="text-success">₹ {{item.Amount}}
+                                            /-</span> on {{item.TransDateTime}} by <span
+                                            class="badge badge-success">{{item.Name}}</span>
+                                    </li>
+                                    <li *ngIf="item.TransTypeId==2">
+                                        <span class="text-danger">₹
+                                            {{item.Amount}}</span> /- Refunded on {{item.TransDateTime}} by <span
+                                            class="badge badge-success">{{item.Name}}</span>
+                                    </li>
+                                </span>
+                            </ul>
+                            <!-- <span *ngIf="item.TransTypeId==1"> </span>
+                                    <span *ngIf="item.TransTypeId==2"></span>
+                                    <br> -->
+                        </div>
+                        <!-- <hr> -->
+                        <div class="row" *ngIf="OrderStatus != -1&&Total-PaidAmount>0">
+                            <div class="col-md-12 pt-0">
+                                <strong class="sp-margin-left20">Pending Payment
+                                    :</strong><span>{{Total-PaidAmount}}</span>
+                            </div>
+                        </div>
+                        <!-- <hr *ngIf="Total-PaidAmount > 0 && OrderStatus != -1"> -->
+                        <!-- <div class="row" *ngIf="Total-PaidAmount > 0 && OrderStatus != -1">
+                            <button class="sp-margin-top20" *ngFor="let item of paymenttypes"
+                                (click)="transaction.PaymentTypeId != 5 && payment(item.Id)">
+                                <span class="sp-option-detail sp-no-user-select">
+                                    <span *ngIf="item.Price > 0" class="glyphicon glyphicon-ok sp-option-selected">
+                                    </span>{{item.Description}}
+                                    <span *ngIf="item.Price > 0 && transaction.PaymentTypeId == 5">Rs.{{item.Price}}
+                                        /-
+                                    </span>
+                                </span>
+                            </button>
+                            <span class="sp-margin-top20">
+                                <span class="sp-option-detail sp-no-user-select" (click)="openOrderpopup(splitpayment)">
+                                    Split Payment
+                                </span>
+                            </span>
+                        </div>
+                        <div *ngIf="OrderStatus != -1">
+                            <span><input *ngIf="transaction.PaymentTypeId != 5 && transaction.PaymentTypeId != 0"
+                                    [(ngModel)]="transaction.Amount" class="form-control custom-select  mt-15"
+                                    id="PaidAmount" type="number" min="0">
+                                <span>
+                                    <button *ngIf="transaction.PaymentTypeId > 0" type="submit"
+                                        class="btn btn-primary float-right" (click)="Pay()">Pay</button>
+                                </span>
+                            </span>
+                        </div> -->
+                    </div>
+                    <div class="col-xl-6">
+                        <div class="table-wrap">
+                            <div class="table-responsive">
+                                <!-- <div class="header">
+                                    <hr class="print">
+                                    <p style="text-align: center;">FB Cakes<br><br>
+                                        Chennai, Tamil Nadu, India<br>
+                                        Receipt: FB-VV0-1905-12<br>
+                                        Sep 16, 2019, at 10:25 AM</p>
+                                    <hr class="print">
+                                </div> -->
+                                <table class="table mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th><strong>Item</strong></th>
+                                            <th><strong>Qty</strong></th>
+                                            <th><strong>Tax%</strong></th>
+                                            <th class="text-right"><strong>Price</strong></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr [ngClass]="{print: last}" *ngFor="let item of orderitem;let last = last"
+                                            style="border-bottom: 1px solid #000;">
+                                            <td>{{item.Description}}</td>
+                                            <td>{{item.Quantity}}{{item.ComplementryQty>0?'+'+item.ComplementryQty:''}}
+                                            </td>
+                                            <td>{{item.Tax1 + item.Tax2 + item.Tax3}}</td>
+                                            <td class="text-right">{{((item.Quantity > 0) ? item.TotalAmount : 0) |
+                                                number: ".2" }}</td>
+                                            <!-- <hr> -->
+                                        </tr>
+                                        <tr>
+                                            <td class="cs" [attr.colspan]="3"><strong>Subtotal</strong><br><br>
+                                                <span
+                                                    *ngFor="let item of AdditionalCharges"><strong>{{item.Description}}</strong><br><br></span>
+                                                <span *ngIf="Discount > 0"><strong>Discount</strong><br><br></span>
+                                                <strong *ngIf="CGST">CGST</strong><br><br>
+                                                <strong *ngIf="SGST">SGST</strong><br><br>
+                                                <strong>Total</strong><br><br>
+                                            </td>
+                                            <td class="text-right">{{Subtotal | number: ".2" }}<br><br>
+                                                <span class="text-right"
+                                                    *ngFor="let item of AdditionalCharges">{{item.ChargeAmount | number:
+                                                    ".2" }}<br><br></span>
+                                                <span class="text-right" *ngIf="Discount > 0">{{Discount | number: ".2"
+                                                    }}<br><br></span>
+                                                <span class="text-right" *ngIf="CGST">{{CGST | number: ".2" }}
+                                                </span><br><br>
+                                                <span class="text-right" *ngIf="SGST">{{SGST | number: ".2" }}
+                                                </span><br><br>
+                                                <span class="text-right">{{Total | number: ".2" }} </span><br><br>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <hr>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+<ng-template #splitpayment let-modal aria-label="modal-basic-title">
+    <div class="modal d-block position-static overflow-show" tabindex="-1" role="dialog">
+        <div class="modal-dialog ma-0" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">SplitPayment</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.close()">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div>Rs.{{remaining}}/-<span class="d-block valid-feedback"
+                            *ngIf="remaining >= 0">Remaining</span><span class="d-block invalid-feedback"
+                            *ngIf="remaining < 0">Exceded</span></div>
+                    <div class="row">
+                        <div class="col-sm">
+                            <form>
+                                <div *ngFor="let item of receipts.PaymentType">
+                                    <div class="form-group row">
+                                        <label for="inputEmail3"
+                                            class="col-sm-4 col-form-label">{{item.Description}}</label>
+                                        <div class="col-sm-8">
+                                            <div class="input-group mb-3">
+                                                <input (input)="sum()" [(ngModel)]="item.Price"
+                                                    name="{{item.Description}}" type="number" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- {{receipts.PaymentType | json}} -->
+                                <!-- <div  class="form-group row">
+                                                <label for="inputEmail3" class="col-sm-4 col-form-label">Card</label>
+                                                <div class="col-sm-8">
+                                                    <div class="input-group mb-3">                                            
+                                                        <input [(ngModel)] ="item.Price" name="Card" type="number" class="form-control" aria-label="Amount (to the nearest dollar)">
+                                                      </div>
+                                                </div>
+                                              </div>-->
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary float-right" [disabled]="remaining < 0"
+                        (click)="modal.close();transaction.PaymentTypeId = 5;setPrice()">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #KOTItem let-modal aria-label="modal-basic-title">
+    <div class="modal d-block position-static overflow-show" tabindex="-1" role="dialog">
+        <div class="modal-dialog ma-0" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Order Ticket</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.close()">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <!-- <div class="col-xs-12">
+                                            <label class="sp-full-width">
+                                                <span class="glyphicon glyphicon-time icon-grey">MainKitchen</span>
+                                                <span class="pull-right sp-pad-right-10">{{customer.Name}} | {{customer.PhoneNo}}</span>
+                                            </label>
+                                        </div> -->
+                        <div class="col-xs-12 col-sm-6" *ngIf="KOTItems.AddedItems.length > 0">
+                            <label><span class="badge badge-primary badge-indicator"></span> Added Items</label>
+                            <div *ngFor="let item of KOTItems.AddedItems" class="sp - margin-bottom5">
+                                <span>{{item.Quantity}} x {{item.Description}}</span>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-6" *ngIf="KOTItems.RemovedItems.length > 0">
+                            <label><span class="badge badge-danger badge-indicator"></span> Removed Items</label>
+                            <div *ngFor="let item of KOTItems.RemovedItems" class="sp - margin-bottom5">
+                                <span>{{item.Quantity}} x {{item.Description}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary float-right" (click)="modal.close()">Ok(Esc)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- </div>   -->
+</ng-template>
+<ng-template #CancelReceipt let-modal aria-label="modal-basic-title">
+    <div class="modal d-block position-static overflow-show" tabindex="-1" role="dialog">
+        <div class="modal-dialog ma-0" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Refund!</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modal.close()">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body text-center pl-100">
+                    <div class="row">
+                        <span>
+                            <span class="sp-margin-top20">
+                                <span class="sp-option-detail sp-no-user-select"
+                                    (click)="transaction.PaymentTypeId = 1">
+                                    <span *ngIf="transaction.PaymentTypeId == 1"
+                                        class="glyphicon glyphicon-ok sp-option-selected"></span>Cash</span></span>
+                            <span class="sp-margin-top20">
+                                <span class="sp-option-detail sp-no-user-select"
+                                    (click)="transaction.PaymentTypeId = 2">
+                                    <span *ngIf="transaction.PaymentTypeId == 2"
+                                        class="glyphicon glyphicon-ok sp-option-selected"></span>Card/Credit</span></span>
+                            <span class="sp-margin-top20">
+                                <span class="sp-option-detail sp-no-user-select"
+                                    (click)="transaction.PaymentTypeId = 3">
+                                    <span *ngIf="transaction.PaymentTypeId == 3"
+                                        class="glyphicon glyphicon-ok sp-option-selected"></span>Others</span></span>
+                        </span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary float-right"
+                        (click)="cancel(PaidAmount);modal.close()">Ok(Esc)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- </div>   -->
+</ng-template>
